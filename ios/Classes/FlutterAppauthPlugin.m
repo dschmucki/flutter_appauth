@@ -164,10 +164,25 @@ NSString *const AUTHORIZE_ERROR_MESSAGE_FORMAT = @"Failed to authorize: %@";
                                                redirectURL:[NSURL URLWithString:redirectUrl]
                                               responseType:OIDResponseTypeCode
                                       additionalParameters:additionalParameters];
+
+        OIDAuthorizationRequest *sapCompliantRequest =
+        [[OIDAuthorizationRequest alloc] initWithConfiguration:serviceConfiguration
+                                                      clientId:clientId
+                                                  clientSecret:clientSecret
+                                                         scope:[[scopes valueForKey:@"description"] componentsJoinedByString:@" "]
+                                                   redirectURL:[NSURL URLWithString:redirectUrl]
+                                                  responseType:OIDResponseTypeCode
+                                                         state:request.state
+                                                         nonce:nil
+                                                  codeVerifier:request.codeVerifier
+                                                 codeChallenge:request.codeChallenge
+                                           codeChallengeMethod:request.codeChallengeMethod
+                                          additionalParameters:additionalParameters];
+
     UIViewController *rootViewController =
     [UIApplication sharedApplication].delegate.window.rootViewController;
     if(exchangeCode) {
-        _currentAuthorizationFlow = [OIDAuthState authStateByPresentingAuthorizationRequest:request presentingViewController: rootViewController
+        _currentAuthorizationFlow = [OIDAuthState authStateByPresentingAuthorizationRequest:sapCompliantRequest presentingViewController: rootViewController
                                                                                    callback:^(OIDAuthState *_Nullable authState,
                                                                                               NSError *_Nullable error) {
                                                                                        if(authState) {
